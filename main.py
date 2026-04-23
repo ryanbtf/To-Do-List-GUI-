@@ -1,27 +1,45 @@
 import tkinter as tk
+import os
 
-def add_tarefa():
-    tarefa = entry.get()
-    if tarefa:
-        listbox.insert(tk.END, tarefa)
+ARQUIVO = "tarefas.txt"
+
+def carregar_tarefas():
+    if os.path.exists(ARQUIVO):
+        with open(ARQUIVO, "r", encoding="utf-8") as f:
+            for linha in f:
+                listbox.insert(tk.END, linha.strip())
+
+def salvar_tarefas():
+    tarefas = listbox.get(0, tk.END)
+    with open(ARQUIVO, "w", encoding="utf-8") as f:
+        for tarefa in tarefas:
+            f.write(tarefa + "\n")
+
+def add_task():
+    task = entry.get()
+    if task:
+        listbox.insert(tk.END, task)
         entry.delete(0, tk.END)
+        salvar_tarefas()
 
-def deletar_tarefa():
+def delete_task():
     selected = listbox.curselection()
     if selected:
         listbox.delete(selected)
+        salvar_tarefas()
 
 root = tk.Tk()
-root.title("Lista de Afazeres")
+root.title("To-Do List")
+root.geometry("400x300")
 
-entry = tk.Entry(root, width=50)
-entry.pack(pady=5)
+entry = tk.Entry(root)
+entry.pack(pady=10)
 
-add_botao = tk.Button(root, text="Adicionar", command=add_tarefa, width=15, height=1)
-add_botao.pack(pady=5)
+add_button = tk.Button(root, text="Adicionar", command=add_task)
+add_button.pack(pady=5)
 
-botao_deletar = tk.Button(root, text="Deletar", command=deletar_tarefa, width=15, height=1)
-botao_deletar.pack(pady=3)
+delete_button = tk.Button(root, text="Remover", command=delete_task)
+delete_button.pack(pady=5)
 
 frame = tk.Frame(root)
 frame.pack(pady=10, fill="both", expand=True)
@@ -35,7 +53,6 @@ scrollbar.pack(side="right", fill="y")
 listbox.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=listbox.yview)
 
-root.geometry("500x400")
-root.minsize(300, 200)
+carregar_tarefas()
 
 root.mainloop()
